@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# https://github.com/docker-library/postgres/issues/582 😬
-defaultDebianSuite='bullseye'
-declare -A debianSuites=(
-	[11]=''
-)
-allDebianSuites=(
+# we will support at most two entries in each of these lists, and both should be in descending order
+supportedDebianSuites=(
+	bookworm
 	bullseye
 )
 supportedAlpineVersions=(
@@ -90,11 +87,6 @@ for version in "${versions[@]}"; do
 		alpine: env.versionAlpineVersion,
 		debian: env.versionDebianSuite,
 	}')"
-
-	versionDebianSuites=()
-	for suite in "${allDebianSuites[@]}"; do
-		versionDebianSuites+=( "$suite" )
-	done
 
 	fullVersion=
 	for suite in "${supportedDebianSuites[@]}"; do

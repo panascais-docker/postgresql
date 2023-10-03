@@ -218,6 +218,15 @@ docker_setup_db() {
 	fi
 }
 
+# ensures that the given extensions are enabled
+docker_setup_extensions() {
+  extensions=$(awk -F',' '{for (i = 1 ; i <= NF ; i++) print $i}' <<< "$POSTGRES_EXTENSIONS");
+  for extension in $extensions; do
+    echo "‣ Loading $extension extension..."
+    psql -U $POSTGRES_USER -d $POSTGRES_DB -c "CREATE EXTENSION IF NOT EXISTS $extension;" >/dev/null 2>&1
+  done
+}
+
 # Loads various settings that are used elsewhere in the script
 # This should be called before any other functions
 docker_setup_env() {
@@ -329,6 +338,7 @@ _main() {
 			docker_temp_server_start "$@"
 
 			docker_setup_db
+			docker_setup_extensions
 			docker_process_init_files /docker-entrypoint-initdb.d/*
 
 			docker_temp_server_stop
